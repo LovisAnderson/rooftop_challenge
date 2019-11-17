@@ -1,0 +1,7 @@
+torch
+numpy
+scipy
+pandas
+pillow
+jupyter
+torchvision
