@@ -6,63 +6,58 @@ from scipy import ndimage
 
 
 class RooftopDataset(object):
-    def __init__(self, root, grayscale=False, transforms=None):
+    def __init__(self, root, grayscale=False, transforms=None, label_subfolder="color_encoded"):
         self.root = root
         self.grayscale = grayscale
         self.transforms = transforms
         # load all image files, sorting them to
         # ensure that they are aligned
         self.imgs = list(sorted(os.listdir(os.path.join(root, "images"))))
-        self.masks = list(sorted(os.listdir(os.path.join(root, "labels"))))
+        self.masks = list(sorted(os.listdir(os.path.join(root, label_subfolder))))
+        self.label_subfolder = label_subfolder
 
     def __getitem__(self, idx):
-        # load images ad masks
+        # load images and masks
 
         img_path = os.path.join(self.root, "images", self.imgs[idx])
-        mask_path = os.path.join(self.root, "labels", self.masks[idx])
+        mask_path = os.path.join(self.root, self.label_subfolder, self.masks[idx])
         with Image.open(img_path) as img:
             if self.grayscale:
                 img = img.convert("L")
             else:
                 img = img.convert("RGB")
-        with Image.open(mask_path) as mask:
-            mask = mask.convert('L')
-        mask_array = np.array(mask)
-        # make the picture binary. 100 is arbitrary but seems to work for dataset
-        mask_array[np.where(mask_array > 100)] = 255
-        mask_array[np.where(mask_array <= 100)] = 0
+        mask = Image.open(mask_path)
+        mask = np.array(mask)
+        # instances are encoded as different colors
+        obj_ids = np.unique(mask)
+        # first id is the background, so remove it
+        obj_ids = obj_ids[1:]
+        # split the color-encoded mask into a set
+        # of binary masks
+        masks = mask == obj_ids[:, None, None]
 
+        # get bounding box coordinates for each mask
+        num_objs = len(obj_ids)
         boxes = []
-        # find different objects (roofs) in mask
-        label_img, nr_labels = ndimage.label(mask_array)
-        for i in range(1, nr_labels + 1):
-            pos = np.where(label_img == i)
+        for i in range(num_objs):
+            pos = np.where(masks[i])
             xmin = np.min(pos[1])
             xmax = np.max(pos[1])
             ymin = np.min(pos[0])
             ymax = np.max(pos[0])
             boxes.append([xmin, ymin, xmax, ymax])
-        labels = torch.ones((nr_labels,), dtype=torch.int64)
-
-        # instances are encoded as different colors
-        obj_ids = np.unique(label_img)
-        # first id is the background, so remove it
-        obj_ids = obj_ids[1:]
-        masks = label_img == obj_ids[:, None, None]
 
         # convert everything into a torch.Tensor
         boxes = torch.as_tensor(boxes, dtype=torch.float32)
         # there is only one class
-        labels = torch.ones((nr_labels,), dtype=torch.int64)
+        labels = torch.ones((num_objs,), dtype=torch.int64)
         masks = torch.as_tensor(masks, dtype=torch.uint8)
 
         image_id = torch.tensor([idx])
         area = (boxes[:, 3] - boxes[:, 1]) * (boxes[:, 2] - boxes[:, 0])
 
         # suppose all instances are not crowd (artifact from coco pretrained net)
-        iscrowd = torch.zeros((nr_labels,), dtype=torch.int64)
-
-        # suppose all instances are not crowd
+        iscrowd = torch.zeros((num_objs,), dtype=torch.int64)
 
         target = {}
         target["boxes"] = boxes
@@ -77,8 +72,7 @@ class RooftopDataset(object):
 
         return img, target
 
-    def save_color_encoded_images(self, subfolder='color_encoded'):
-        color_codes = [10, 40, 70, 100, 130, 160, 190, 220, 250]
+    def save_color_encoded_images(self, subfolder='color_encoded', treshold=150):
 
         subfolder_path = os.path.join(self.root, subfolder)
         if not os.path.exists(subfolder_path):
@@ -89,16 +83,19 @@ class RooftopDataset(object):
             with Image.open(mask_path) as mask:
                 mask = mask.convert('L')
             mask_array = np.array(mask)
-            # make the picture binary. 100 is arbitrary but seems to work for dataset
-            mask_array[np.where(mask_array > 100)] = 255
-            mask_array[np.where(mask_array <= 100)] = 0
+            # make the picture binary.  is arbitrary but seems to work for dataset
+            # There are grey pixel at the boundary we use treshold to decide if they are white or black
+            # treshold=150 correctly identified all rooftops
+            # todo: borders might be identified as non-roof even if they belong to the roof. Investigate!
+            mask_array[np.where(mask_array > treshold)] = 255
+            mask_array[np.where(mask_array <= treshold)] = 0
             label_img, nr_labels = ndimage.label(mask_array)
 
             colored = mask_array
             print(f'nr labels: {nr_labels}')
             for i in range(1, nr_labels + 1):
-                colored[np.where(label_img == i)] = color_codes[i-1]
-            img = Image.fromarray(colored, 'L')
+                colored[np.where(label_img == i)] = i
+            img = Image.fromarray(colored)
             img.save(os.path.join(subfolder_path, mask_file_name))
 
     def __len__(self):
