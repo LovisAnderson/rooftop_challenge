@@ -3,6 +3,8 @@ import numpy as np
 from PIL import Image
 import torch
 from scipy import ndimage
+from torchvision.transforms import functional as F
+import random
 
 
 class RooftopDataset(object):
@@ -26,7 +28,17 @@ class RooftopDataset(object):
                 img = img.convert("L")
             else:
                 img = img.convert("RGB")
+
         mask = Image.open(mask_path)
+        if self.transforms is not None:
+            # In order to get the same transformations for img and target we use the same seed for both
+            RANDOM_SEED = np.random.randint(2147483647)
+            random.seed(RANDOM_SEED)
+            torch.manual_seed(RANDOM_SEED)
+            img = self.transforms(img)
+            random.seed(RANDOM_SEED)
+            torch.manual_seed(RANDOM_SEED)
+            mask = self.transforms(mask)
         mask = np.array(mask)
         # instances are encoded as different colors
         obj_ids = np.unique(mask)
@@ -66,9 +78,7 @@ class RooftopDataset(object):
         target["image_id"] = image_id
         target["area"] = area
         target["iscrowd"] = iscrowd
-
-        if self.transforms is not None:
-            img, target = self.transforms(img, target)
+        img = F.to_tensor(img)
 
         return img, target
 
