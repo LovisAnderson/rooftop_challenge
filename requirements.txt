@@ -1,7 +1,12 @@
+keras
 torch
 numpy
 scipy
 pandas
 pillow
 jupyter
+segmentation_models
+tensorflow
 torchvision
+tensorflow_datasets
+opencv-python
