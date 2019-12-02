@@ -26,15 +26,12 @@ import cv2
 import keras
 import numpy as np
 import matplotlib.pyplot as plt
+import segmentation_models as sm
 
-
-# In[2]:
 
 
 DATA_DIR = 'images/'
 
-
-# In[3]:
 
 
 x_train_dir = os.path.join(DATA_DIR, 'frames/train')
@@ -194,15 +191,6 @@ dataset = Dataset(x_train_dir, y_train_dir, classes=[
     #'unlabelled',
     'rooftop'])
 
-image, mask = dataset[5] # get some sample
-visualize(
-    image=image, 
-    background=mask[..., 0].squeeze(),
-    #rooftop_mask=mask[..., 1].squeeze(),
-    #background_mask=mask[..., 2].squeeze(),
-)
-
-
 # ### Augmentations
 
 # Data augmentation is a powerful technique to increase the amount of your data and prevent model overfitting.  
@@ -305,31 +293,12 @@ def get_preprocessing(preprocessing_fn):
     return A.Compose(_transform)
 
 
-# In[8]:
-
-
-# Lets look at augmented data we have
-dataset = Dataset(x_train_dir, y_train_dir, classes=['rooftop'], augmentation=get_training_augmentation())
-
-image, mask = dataset[12] # get some sample
-visualize(
-    image=image, 
-    rooftop_mask=mask[..., 0].squeeze(),
-)
-
 
 # # Segmentation model training
-
-# In[9]:
-
-
-import segmentation_models as sm
 
 # segmentation_models could also use `tf.keras` if you do not have Keras installed
 # or you could switch to other framework using `sm.set_framework('tf.keras')`
 
-
-# In[10]:
 
 
 BACKBONE = 'efficientnetb3'
@@ -341,18 +310,12 @@ EPOCHS = 40
 preprocess_input = sm.get_preprocessing(BACKBONE)
 
 
-# In[11]:
-
-
 # define network parameters
 n_classes = 1 if len(CLASSES) == 1 else (len(CLASSES) + 1)  # case for binary and multiclass segmentation
 activation = 'sigmoid' if n_classes == 1 else 'softmax'
 
 #create model
 model = sm.Unet(BACKBONE, classes=n_classes, activation=activation)
-
-
-# In[12]:
 
 
 # define optomizer
@@ -370,9 +333,7 @@ metrics = [sm.metrics.IOUScore(threshold=0.5), sm.metrics.FScore(threshold=0.5)]
 
 # compile keras model with defined optimozer, loss and metrics
 model.compile(optim, total_loss, metrics)
-
-
-# In[13]:
+print('Model compiled!')
 
 
 # Dataset for train images
@@ -406,14 +367,7 @@ callbacks = [
     keras.callbacks.ReduceLROnPlateau(),
 ]
 
-
-# In[14]:
-
-
-train_dataloader[0][1].shape
-
-
-# In[ ]:
+print(f'dataloader shape: {train_dataloader[0][1].shape}')
 
 
 # train model
@@ -425,10 +379,6 @@ history = model.fit_generator(
     validation_data=valid_dataloader, 
     validation_steps=len(valid_dataloader),
 )
-
-
-# In[ ]:
-
 
 # Plot training & validation iou_score values
 plt.figure(figsize=(30, 5))
