@@ -44,8 +44,8 @@ BACKBONE = 'efficientnetb3'
 BATCH_SIZE = 2
 BATCH_SIZE_CC = 16
 CLASSES = ['rooftop']
-LR = 0.0001
-EPOCHS = 50
+LR = 0.0005
+EPOCHS = 20
 EPOCHS_CC = 20
 
 preprocess_input = sm.get_preprocessing(BACKBONE)
@@ -108,17 +108,16 @@ valid_dataset = Dataset(
 )
 
 
-
 train_dataloader = Dataloder(train_dataset, batch_size=BATCH_SIZE, shuffle=True)
 train_dataloader_cc = Dataloder(train_dataset_cc, batch_size=BATCH_SIZE_CC, shuffle=True)
 
 valid_dataloader = Dataloder(valid_dataset, batch_size=1, shuffle=False)
 
 # check shapes for errors
-assert train_dataloader[0][0].shape == (BATCH_SIZE, 320, 320, 3)
-assert train_dataloader[0][1].shape == (BATCH_SIZE, 320, 320, n_classes)
-assert train_dataloader_cc[0][0].shape == (BATCH_SIZE_CC, 320, 320, 3)
-assert train_dataloader_cc[0][1].shape == (BATCH_SIZE_CC, 320, 320, n_classes)
+assert train_dataloader[0][0].shape == (BATCH_SIZE, 256, 256, 3)
+assert train_dataloader[0][1].shape == (BATCH_SIZE, 256, 256, n_classes)
+assert train_dataloader_cc[0][0].shape == (BATCH_SIZE_CC, 256, 256, 3)
+assert train_dataloader_cc[0][1].shape == (BATCH_SIZE_CC, 256, 256, n_classes)
 
 
 # define callbacks for learning rate scheduling and best checkpoints saving

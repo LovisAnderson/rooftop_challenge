@@ -37,10 +37,10 @@ def get_training_augmentation():
 
         A.ShiftScaleRotate(scale_limit=0.0, rotate_limit=360, shift_limit=0.1, p=1, border_mode=0),
 
-        A.PadIfNeeded(min_height=320, min_width=320, always_apply=True, border_mode=0),
-        A.RandomCrop(height=320, width=320, always_apply=True),
+        A.PadIfNeeded(min_height=256, min_width=256, always_apply=True, border_mode=0),
+        A.RandomCrop(height=256, width=256, always_apply=True),
 
-        A.IAAAdditiveGaussianNoise(p=0.2),
+        # A.IAAAdditiveGaussianNoise(p=0.2),
         # Satellite pictures always have the same perspective,
         # Therefore we do not want our model to learn the concept of perspective
         # A.IAAPerspective(p=0.5),
@@ -82,13 +82,11 @@ def get_training_augmentation():
 
 def get_cc_training_augmentation():
     train_transform = [
-        A.CropNonEmptyMaskIfExists(height=960, width=960, always_apply=True),
-        A.Resize(height=320, width=320),
+        A.CropNonEmptyMaskIfExists(height=640, width=640, always_apply=True),
+        A.Resize(height=256, width=256),
         A.HorizontalFlip(p=0.5),
         A.VerticalFlip(p=0.5),
-        #A.ShiftScaleRotate(scale_limit=0.0, rotate_limit=360, shift_limit=0.1, p=0.5, border_mode=0),
-
-        A.PadIfNeeded(min_height=320, min_width=320, always_apply=True, border_mode=0),
+        A.PadIfNeeded(min_height=256, min_width=256, always_apply=True, border_mode=0),
 
     ]
     return A.Compose(train_transform)
@@ -97,7 +95,7 @@ def get_cc_training_augmentation():
 def get_validation_augmentation():
     """Add paddings to make image shape divisible by 32"""
     test_transform = [
-        A.PadIfNeeded(384, 480)
+        A.PadIfNeeded(256, 256)
     ]
     return A.Compose(test_transform)
 
