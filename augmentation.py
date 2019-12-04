@@ -34,49 +34,51 @@ def get_training_augmentation():
     train_transform = [
 
         A.HorizontalFlip(p=0.5),
-
+        A.VerticalFlip(p=0.5),
         A.ShiftScaleRotate(scale_limit=0.0, rotate_limit=360, shift_limit=0.1, p=1, border_mode=0),
 
         A.PadIfNeeded(min_height=256, min_width=256, always_apply=True, border_mode=0),
         A.RandomCrop(height=256, width=256, always_apply=True),
+
+        ### We do not use these transformations since our data is not noisy and very uniform ###
 
         # A.IAAAdditiveGaussianNoise(p=0.2),
         # Satellite pictures always have the same perspective,
         # Therefore we do not want our model to learn the concept of perspective
         # A.IAAPerspective(p=0.5),
 
-        A.OneOf(
-            [
-                A.CLAHE(p=1),
-                A.RandomBrightness(p=1),
-                A.RandomGamma(p=1),
-            ],
-            p=0.9,
-        ),
-
-        A.OneOf(
-            [
-                A.IAASharpen(p=1),
-                A.Blur(blur_limit=3, p=1),
-                A.MotionBlur(blur_limit=3, p=1),
-            ],
-            p=0.9,
-        ),
-
-        A.OneOf(
-            [
-                A.RandomContrast(p=1),
-                A.HueSaturationValue(p=1),
-            ],
-            p=0.9,
-        ),
-        A.Lambda(mask=round_clip_0_1)
+        # A.OneOf(
+        #     [
+        #         A.CLAHE(p=1),
+        #         A.RandomBrightness(p=1),
+        #         A.RandomGamma(p=1),
+        #     ],
+        #     p=0.9,
+        # ),
+        #
+        # A.OneOf(
+        #     [
+        #         A.IAASharpen(p=1),
+        #         A.Blur(blur_limit=3, p=1),
+        #         A.MotionBlur(blur_limit=3, p=1),
+        #     ],
+        #     p=0.9,
+        # ),
+        #
+        # A.OneOf(
+        #     [
+        #         A.RandomContrast(p=1),
+        #         A.HueSaturationValue(p=1),
+        #     ],
+        #     p=0.9,
+        # ),
+        # A.Lambda(mask=round_clip_0_1)
     ]
     return A.Compose(train_transform)
 
 
 # christchurch dataset is large and we do not need to augment it that much.
-# Since the pictures are taken from farer away and a larger we want to crop first
+# Since the pictures are taken from more further afar and are larger we want to crop first
 # For better training we crop images where there is a non-empty mask
 
 
