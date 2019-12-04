@@ -10,7 +10,8 @@
 
 ## I used
 - Pretrained model from https://github.com/qubvel/segmentation_models
-- Additional data from  https://www.airs-dataset.com/ (I did not have the time to take full advantage of it)
+- Additional data from  https://www.airs-dataset.com/ (I did not
+ have the time to take full advantage of it). Data is too large to put here(~17gb) and possibly proprietary
 - https://dataturks.com/ for annotation of validation images (I did not train on them, just for easier model evaluation)
 
 ## Next steps
