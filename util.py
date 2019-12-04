@@ -28,6 +28,7 @@ def denormalize(x):
 def save_predictions(dataset, model, out_path='images/results'):
     for i in range(len(dataset)):
         image, gt_mask = dataset[i]
+        image = np.expand_dims(image, axis=0)
         image_name = dataset.ids[i]
         pr_mask = model.predict(image).round()
         plt.imsave(f'{out_path}/{image_name}', pr_mask[..., 0].squeeze())
