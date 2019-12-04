@@ -9,5 +9,3 @@ scipy
 segmentation_models
 tensorflow
 tensorflow_datasets
-torch
-torchvision
