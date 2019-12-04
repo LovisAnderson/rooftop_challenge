@@ -10,8 +10,10 @@
 
 import os
 
-from augmentation import get_training_augmentation, get_cc_training_augmentation, get_preprocessing
-from data import Dataset, Dataloder
+from .augmentation import get_training_augmentation, get_cc_training_augmentation, get_preprocessing
+from .data import Dataset, Dataloder
+from .util import save_predictions
+
 
 os.environ['CUDA_VISIBLE_DEVICES'] = '0'
 
@@ -57,7 +59,7 @@ activation = 'sigmoid' if n_classes == 1 else 'softmax'
 model = sm.Unet(BACKBONE, classes=n_classes, activation=activation)
 
 # load existing weights
-model.load_weights('best_model_old.h5')
+model.load_weights('best_model.h5')
 
 # define optimizer
 optim = keras.optimizers.Adam(LR)
@@ -145,14 +147,17 @@ history_cc = model.fit_generator(
 # train model on dida data to fit better
 history = model.fit_generator(
     train_dataloader,
-    steps_per_epoch=len(train_dataloader), #len(train_dataloader),
+    steps_per_epoch=len(train_dataloader),
     epochs=EPOCHS,
     callbacks=callbacks,
     validation_data=valid_dataloader,
     validation_steps=len(valid_dataloader),
 )
 
-# model.load_weights('best_model.h5')
+
+# Create and save result images
+model.load_weights('best_model.h5')
+save_predictions(valid_dataset, model)
 
 
 

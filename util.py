@@ -23,3 +23,11 @@ def denormalize(x):
     x = (x - x_min) / (x_max - x_min)
     x = x.clip(0, 1)
     return x
+
+
+def save_predictions(dataset, model, out_path='images/results'):
+    for i in range(len(dataset)):
+        image, gt_mask = dataset[i]
+        image_name = dataset.ids[i]
+        pr_mask = model.predict(image).round()
+        plt.imsave(f'{out_path}/{image_name}', pr_mask[..., 0].squeeze())
