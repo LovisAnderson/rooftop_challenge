@@ -10,9 +10,9 @@
 
 import os
 
-from .augmentation import get_training_augmentation, get_cc_training_augmentation, get_preprocessing
-from .data import Dataset, Dataloder
-from .util import save_predictions
+from augmentation import get_training_augmentation, get_cc_training_augmentation, get_preprocessing
+from data import Dataset, Dataloder
+from util import save_predictions
 
 
 os.environ['CUDA_VISIBLE_DEVICES'] = '0'
@@ -134,14 +134,14 @@ callbacks_cc = [
 ]
 
 # train model on christchurch data
-history_cc = model.fit_generator(
-    train_dataloader,
-    steps_per_epoch=len(train_dataloader_cc),
-    epochs=EPOCHS_CC,
-    callbacks=callbacks,
-    validation_data=valid_dataloader,
-    validation_steps=len(valid_dataloader),
-)
+# history_cc = model.fit_generator(
+#     train_dataloader,
+#     steps_per_epoch=len(train_dataloader_cc),
+#     epochs=EPOCHS_CC,
+#     callbacks=callbacks,
+#     validation_data=valid_dataloader,
+#     validation_steps=len(valid_dataloader),
+# )
 
 # train model on dida data to fit better
 history = model.fit_generator(

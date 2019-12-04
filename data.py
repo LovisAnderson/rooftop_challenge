@@ -15,12 +15,11 @@ class Dataset:
         augmentation (albumentations.Compose): data transfromation pipeline
             (e.g. flip, scale, etc.)
         preprocessing (albumentations.Compose): data preprocessing
-            (e.g. noralization, shape manipulation, etc.)
+            (e.g. normalization, shape manipulation, etc.)
 
     """
 
-    CLASSES = [#'unlabelled',
-               'rooftop']
+    CLASSES = ['rooftop']
 
     def __init__(
             self,
@@ -49,7 +48,7 @@ class Dataset:
         mask2 = np.ones(mask.shape)
         mask2[np.where(mask >= 150)] = 0
         mask = mask2
-        # extract certain classes from mask (e.g. cars)
+        # extract certain classes from mask (e.g. rooftops)
         masks = [(mask == v) for v in self.class_values]
         mask = np.stack(masks, axis=-1).astype('float')
 
