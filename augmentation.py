@@ -39,10 +39,13 @@ def get_training_augmentation():
 
         A.PadIfNeeded(min_height=256, min_width=256, always_apply=True, border_mode=0),
         A.RandomCrop(height=256, width=256, always_apply=True),
+        # To prevent overfitting
+        A.IAAAdditiveGaussianNoise(p=0.3),
+        ### We do not use these transformations since our validation data is not different regarding
+        # HUE, contrast brightness and saturation
+        # and very uniform ###
 
-        ### We do not use these transformations since our data is not noisy and very uniform ###
 
-        # A.IAAAdditiveGaussianNoise(p=0.2),
         # Satellite pictures always have the same perspective,
         # Therefore we do not want our model to learn the concept of perspective
         # A.IAAPerspective(p=0.5),
