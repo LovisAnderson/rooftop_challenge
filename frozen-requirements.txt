@@ -9,7 +9,7 @@ basemap==1.1.0
 cbor==1.0.0
 configobj==5.0.6
 constantly==15.1.0
-cryptography==2.1.4
+cryptography==2.3
 cvs2svn==2.5.0
 cycler==0.10.0
 Cython==0.26.1
