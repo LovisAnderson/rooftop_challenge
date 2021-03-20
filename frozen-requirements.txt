@@ -24,7 +24,7 @@ incremental==16.10.1
 ipaddress==1.0.17
 ipython==5.5.0
 ipython-genutils==0.2.0
-Jinja2==2.10
+Jinja2==2.11.3
 lxml==4.2.1
 lz4==0.10.1
 MarkupSafe==1.0
