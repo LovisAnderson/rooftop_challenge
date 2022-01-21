@@ -22,7 +22,7 @@ hyperlink==17.3.1
 idna==2.6
 incremental==16.10.1
 ipaddress==1.0.17
-ipython==5.5.0
+ipython==7.16.3
 ipython-genutils==0.2.0
 Jinja2==2.10
 lxml==4.2.1
