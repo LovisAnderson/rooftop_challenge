@@ -33,7 +33,7 @@ mercurial==4.5.3
 mpi4py==2.0.0
 mpmath==1.0.0
 networkx==1.11
-numpy==1.13.3
+numpy==1.22.0
 pandas==0.22.0
 pathlib2==2.3.0
 pep8==1.7.1
