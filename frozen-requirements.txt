@@ -42,7 +42,7 @@ pickleshare==0.7.4
 Pillow==5.1.0
 pkginfo==1.2.1
 prompt-toolkit==1.0.15
-protobuf==3.0.0
+protobuf==3.18.3
 psutil==5.4.2
 py-ubjson==0.8.5
 pyasn1==0.4.2
